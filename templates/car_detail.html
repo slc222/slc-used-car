@@ -1,0 +1,848 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ car.name }} - 蜀来驰二手车</title>
+    <link rel="stylesheet" href="/static/css/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        .detail-section {
+            padding: 40px 0;
+            background: #f8f9fa;
+            min-height: calc(100vh - 300px);
+        }
+
+        .detail-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        .breadcrumb {
+            padding: 20px 0;
+        }
+
+        .breadcrumb-container {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .breadcrumb a {
+            color: #666;
+            text-decoration: none;
+            transition: color 0.3s;
+        }
+
+        .breadcrumb a:hover {
+            color: #e94560;
+        }
+
+        .breadcrumb span {
+            color: #999;
+        }
+
+        .breadcrumb-current {
+            color: #333;
+            font-weight: 500;
+        }
+
+        .detail-grid {
+            display: grid;
+            grid-template-columns: 1fr 400px;
+            gap: 40px;
+        }
+
+        /* Image Gallery */
+        .image-gallery {
+            background: #fff;
+            border-radius: 20px;
+            overflow: hidden;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+        }
+
+        .gallery-main {
+            position: relative;
+            height: 450px;
+            overflow: hidden;
+        }
+
+        .gallery-main-image {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            cursor: zoom-in;
+        }
+
+        .gallery-nav {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 50px;
+            height: 50px;
+            background: rgba(255, 255, 255, 0.9);
+            border: none;
+            border-radius: 50%;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+            color: #333;
+            transition: all 0.3s;
+            z-index: 10;
+        }
+
+        .gallery-nav:hover {
+            background: #e94560;
+            color: #fff;
+        }
+
+        .gallery-nav.prev {
+            left: 20px;
+        }
+
+        .gallery-nav.next {
+            right: 20px;
+        }
+
+        .gallery-thumbnails {
+            display: flex;
+            gap: 10px;
+            padding: 15px;
+            overflow-x: auto;
+        }
+
+        .gallery-thumb {
+            width: 80px;
+            height: 60px;
+            border-radius: 8px;
+            overflow: hidden;
+            cursor: pointer;
+            opacity: 0.6;
+            transition: all 0.3s;
+            flex-shrink: 0;
+        }
+
+        .gallery-thumb:hover,
+        .gallery-thumb.active {
+            opacity: 1;
+            box-shadow: 0 0 0 3px #e94560;
+        }
+
+        .gallery-thumb img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        /* Car Info Card */
+        .car-info-card {
+            background: #fff;
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+            position: sticky;
+            top: 90px;
+        }
+
+        .car-title {
+            font-size: 1.5rem;
+            color: #333;
+            margin-bottom: 20px;
+            line-height: 1.4;
+        }
+
+        .car-price {
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: #e94560;
+            margin-bottom: 25px;
+        }
+
+        .car-price span {
+            font-size: 1.2rem;
+            font-weight: 400;
+        }
+
+        .car-specs {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+            margin-bottom: 25px;
+            padding-bottom: 25px;
+            border-bottom: 1px solid #eee;
+        }
+
+        .car-spec {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .car-spec-icon {
+            width: 40px;
+            height: 40px;
+            background: #fff5f7;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #e94560;
+            font-size: 1rem;
+        }
+
+        .car-spec-info {
+            flex: 1;
+        }
+
+        .car-spec-label {
+            font-size: 0.8rem;
+            color: #999;
+        }
+
+        .car-spec-value {
+            font-size: 1rem;
+            color: #333;
+            font-weight: 500;
+        }
+
+        .car-description {
+            margin-bottom: 25px;
+            padding-bottom: 25px;
+            border-bottom: 1px solid #eee;
+        }
+
+        .car-description h4 {
+            font-size: 1rem;
+            color: #333;
+            margin-bottom: 10px;
+        }
+
+        .car-description p {
+            color: #666;
+            line-height: 1.7;
+            font-size: 0.95rem;
+        }
+
+        .car-actions {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .btn-contact {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            padding: 15px 30px;
+            border-radius: 30px;
+            font-size: 1rem;
+            font-weight: 600;
+            text-decoration: none;
+            transition: all 0.3s;
+            cursor: pointer;
+            border: none;
+            width: 100%;
+        }
+
+        .btn-contact-phone {
+            background: linear-gradient(135deg, #e94560, #ff6b6b);
+            color: #fff;
+        }
+
+        .btn-contact-phone:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 30px rgba(233, 69, 96, 0.4);
+        }
+
+        .btn-contact-wechat {
+            background: #07c160;
+            color: #fff;
+        }
+
+        .btn-contact-wechat:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 30px rgba(7, 193, 96, 0.4);
+        }
+
+        /* Inspection Report */
+        .inspection-section {
+            margin-top: 40px;
+        }
+
+        .section-card {
+            background: #fff;
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+            margin-bottom: 30px;
+        }
+
+        .section-card h3 {
+            font-size: 1.3rem;
+            color: #333;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .section-card h3 i {
+            color: #e94560;
+        }
+
+        .inspection-items {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 15px;
+        }
+
+        .inspection-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 15px;
+            background: #f8f9fa;
+            border-radius: 10px;
+        }
+
+        .inspection-item i {
+            font-size: 1.2rem;
+            color: #07c160;
+        }
+
+        .inspection-item.warning i {
+            color: #ff9800;
+        }
+
+        .inspection-item-text {
+            font-size: 0.9rem;
+            color: #333;
+        }
+
+        .inspection-report {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 12px;
+            line-height: 1.8;
+            color: #666;
+        }
+
+        /* Related Cars */
+        .related-section {
+            margin-top: 50px;
+        }
+
+        .related-section h3 {
+            font-size: 1.5rem;
+            color: #333;
+            margin-bottom: 25px;
+        }
+
+        .related-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 25px;
+        }
+
+        /* Floating Contact */
+        .floating-contact {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            z-index: 1000;
+        }
+
+        .floating-btn {
+            width: 55px;
+            height: 55px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #fff;
+            font-size: 1.3rem;
+            cursor: pointer;
+            transition: all 0.3s;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.2);
+            text-decoration: none;
+        }
+
+        .floating-btn:hover {
+            transform: scale(1.1);
+        }
+
+        .floating-btn.phone {
+            background: linear-gradient(135deg, #e94560, #ff6b6b);
+        }
+
+        .floating-btn.wechat {
+            background: #07c160;
+        }
+
+        .floating-btn.top {
+            background: #333;
+            opacity: 0;
+            pointer-events: none;
+        }
+
+        .floating-btn.top.show {
+            opacity: 1;
+            pointer-events: auto;
+        }
+
+        /* Modal */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.6);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 2000;
+        }
+
+        .modal-overlay.show {
+            display: flex;
+        }
+
+        .modal-content {
+            background: #fff;
+            border-radius: 20px;
+            padding: 40px;
+            max-width: 400px;
+            width: 90%;
+            text-align: center;
+            position: relative;
+        }
+
+        .modal-close {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            width: 30px;
+            height: 30px;
+            border: none;
+            background: #f0f0f0;
+            border-radius: 50%;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal-content h3 {
+            font-size: 1.3rem;
+            color: #333;
+            margin-bottom: 20px;
+        }
+
+        .modal-content p {
+            color: #666;
+            margin-bottom: 25px;
+        }
+
+        .modal-content .phone-number {
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: #e94560;
+            margin-bottom: 20px;
+        }
+
+        @media (max-width: 992px) {
+            .detail-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .car-info-card {
+                position: relative;
+                top: 0;
+            }
+
+            .gallery-main {
+                height: 350px;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .gallery-main {
+                height: 280px;
+            }
+
+            .gallery-nav {
+                width: 40px;
+                height: 40px;
+            }
+
+            .car-title {
+                font-size: 1.3rem;
+            }
+
+            .car-price {
+                font-size: 2rem;
+            }
+
+            .floating-contact {
+                bottom: 20px;
+                right: 20px;
+            }
+
+            .floating-btn {
+                width: 48px;
+                height: 48px;
+                font-size: 1.1rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <header class="header">
+        <div class="container">
+            <div class="header-content">
+                <a href="/" class="logo">
+                    <i class="fas fa-car-side"></i>
+                    <span>蜀来驰二手车</span>
+                </a>
+                <nav class="nav">
+                    <a href="/" class="nav-link">首页</a>
+                    <a href="/cars" class="nav-link">全部车源</a>
+                    <a href="/contact" class="nav-link">联系我们</a>
+                </nav>
+                <div class="header-phone">
+                    <i class="fas fa-phone"></i>
+                    <span>在线咨询</span>
+                </div>
+                <button class="mobile-menu-btn" id="mobileMenuBtn">
+                    <i class="fas fa-bars"></i>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- Mobile Menu -->
+    <div class="mobile-menu" id="mobileMenu">
+        <div class="mobile-menu-content">
+            <a href="/">首页</a>
+            <a href="/cars">全部车源</a>
+            <a href="/contact">联系我们</a>
+        </div>
+    </div>
+
+    <!-- Detail Section -->
+    <section class="detail-section">
+        <div class="detail-container">
+            <!-- Breadcrumb -->
+            <div class="breadcrumb">
+                <div class="breadcrumb-container">
+                    <a href="/">首页</a>
+                    <span>/</span>
+                    <a href="/cars">全部车源</a>
+                    <span>/</span>
+                    <span class="breadcrumb-current">{{ car.name }}</span>
+                </div>
+            </div>
+
+            <div class="detail-grid">
+                <!-- Left: Images -->
+                <div class="image-gallery">
+                    <div class="gallery-main">
+                        {% if images and images|length > 0 %}
+                        <img src="{{ images[0] }}" alt="{{ car.name }}" class="gallery-main-image" id="mainImage">
+                        {% else %}
+                        <img src="/static/images/placeholder.jpg" alt="{{ car.name }}" class="gallery-main-image" id="mainImage">
+                        {% endif %}
+                        {% if images|length > 1 %}
+                        <button class="gallery-nav prev" onclick="changeImage(-1)">
+                            <i class="fas fa-chevron-left"></i>
+                        </button>
+                        <button class="gallery-nav next" onclick="changeImage(1)">
+                            <i class="fas fa-chevron-right"></i>
+                        </button>
+                        {% endif %}
+                    </div>
+                    {% if images|length > 1 %}
+                    <div class="gallery-thumbnails">
+                        {% for img in images %}
+                        <div class="gallery-thumb {% if loop.first %}active{% endif %}" onclick="selectImage('{{ img }}', this)">
+                            <img src="{{ img }}" alt="Thumbnail {{ loop.index }}">
+                        </div>
+                        {% endfor %}
+                    </div>
+                    {% endif %}
+                </div>
+
+                <!-- Right: Info -->
+                <div class="car-info-card">
+                    <h1 class="car-title">{{ car.name }}</h1>
+                    <div class="car-price">{{ car.price }}<span>万</span></div>
+
+                    <div class="car-specs">
+                        <div class="car-spec">
+                            <div class="car-spec-icon">
+                                <i class="fas fa-calendar-alt"></i>
+                            </div>
+                            <div class="car-spec-info">
+                                <div class="car-spec-label">上牌时间</div>
+                                <div class="car-spec-value">{{ car.year }}年</div>
+                            </div>
+                        </div>
+                        <div class="car-spec">
+                            <div class="car-spec-icon">
+                                <i class="fas fa-tachometer-alt"></i>
+                            </div>
+                            <div class="car-spec-info">
+                                <div class="car-spec-label">行驶里程</div>
+                                <div class="car-spec-value">{{ car.mileage }}万公里</div>
+                            </div>
+                        </div>
+                        <div class="car-spec">
+                            <div class="car-spec-icon">
+                                <i class="fas fa-tag"></i>
+                            </div>
+                            <div class="car-spec-info">
+                                <div class="car-spec-label">品牌车系</div>
+                                <div class="car-spec-value">{{ car.brand }}</div>
+                            </div>
+                        </div>
+                        <div class="car-spec">
+                            <div class="car-spec-icon">
+                                <i class="fas fa-car"></i>
+                            </div>
+                            <div class="car-spec-info">
+                                <div class="car-spec-label">车辆状态</div>
+                                <div class="car-spec-value">{% if car.status == 'onsale' %}在售{% else %}已售{% endif %}</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="car-description">
+                        <h4>车况描述</h4>
+                        <p>{{ car.description if car.description else '车辆车况良好，欢迎到店看车咨询。' }}</p>
+                    </div>
+
+                    <div class="car-actions">
+                        <button class="btn-contact btn-contact-phone" onclick="showPhoneModal()">
+                            <i class="fas fa-phone-alt"></i>
+                            电话咨询
+                        </button>
+                        <button class="btn-contact btn-contact-wechat" onclick="showWechatModal()">
+                            <i class="fab fa-weixin"></i>
+                            微信咨询
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Inspection Report -->
+            {% if car.inspection_report %}
+            <div class="inspection-section">
+                <div class="section-card">
+                    <h3><i class="fas fa-clipboard-check"></i> 三方检测报告</h3>
+                    <div class="inspection-items">
+                        <div class="inspection-item">
+                            <i class="fas fa-check-circle"></i>
+                            <span class="inspection-item-text">重大事故排查</span>
+                        </div>
+                        <div class="inspection-item">
+                            <i class="fas fa-check-circle"></i>
+                            <span class="inspection-item-text">泡水火烧排查</span>
+                        </div>
+                        <div class="inspection-item">
+                            <i class="fas fa-check-circle"></i>
+                            <span class="inspection-item-text">车身骨架检测</span>
+                        </div>
+                        <div class="inspection-item">
+                            <i class="fas fa-check-circle"></i>
+                            <span class="inspection-item-text">发动机变速箱</span>
+                        </div>
+                    </div>
+                    <div class="inspection-report" style="margin-top: 20px;">
+                        {{ car.inspection_report }}
+                    </div>
+                </div>
+            </div>
+            {% endif %}
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-section">
+                    <h3>蜀来驰二手车</h3>
+                    <p>专业二手车服务商</p>
+                </div>
+                <div class="footer-section">
+                    <h4>快速链接</h4>
+                    <ul>
+                        <li><a href="/">首页</a></li>
+                        <li><a href="/cars">全部车源</a></li>
+                        <li><a href="/contact">联系我们</a></li>
+                    </ul>
+                </div>
+                <div class="footer-section">
+                    <h4>联系方式</h4>
+                    <ul>
+                        <li><i class="fas fa-phone"></i> {{ shop_phone }}</li>
+                        <li><i class="fas fa-map-marker-alt"></i> 四川省威远县</li>
+                    </ul>
+                </div>
+                <div class="footer-section">
+                    <h4>关注我们</h4>
+                    <div class="social-links">
+                        <a href="#" class="social-link"><i class="fab fa-weixin"></i></a>
+                        <a href="#" class="social-link"><i class="fab fa-weibo"></i></a>
+                        <a href="#" class="social-link"><i class="fab fa-tiktok"></i></a>
+                    </div>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2024 蜀来驰二手车. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Floating Contact -->
+    <div class="floating-contact">
+        <a href="javascript:scrollToTop()" class="floating-btn top" id="backToTop">
+            <i class="fas fa-chevron-up"></i>
+        </a>
+        <a href="tel:{{ shop_phone }}" class="floating-btn phone">
+            <i class="fas fa-phone-alt"></i>
+        </a>
+        <a href="javascript:showWechatModal()" class="floating-btn wechat">
+            <i class="fab fa-weixin"></i>
+        </a>
+    </div>
+
+    <!-- Phone Modal -->
+    <div class="modal-overlay" id="phoneModal">
+        <div class="modal-content">
+            <button class="modal-close" onclick="closeModal('phoneModal')">
+                <i class="fas fa-times"></i>
+            </button>
+            <h3>联系电话</h3>
+            <p>欢迎致电咨询，车辆详细信息请电话沟通</p>
+            <div class="phone-number">{{ shop_phone }}</div>
+            <a href="tel:{{ shop_phone }}" class="btn-contact btn-contact-phone">
+                <i class="fas fa-phone-alt"></i>
+                立即拨打
+            </a>
+        </div>
+    </div>
+
+    <!-- Wechat Modal -->
+    <div class="modal-overlay" id="wechatModal">
+        <div class="modal-content">
+            <button class="modal-close" onclick="closeModal('wechatModal')">
+                <i class="fas fa-times"></i>
+            </button>
+            <h3>微信咨询</h3>
+            <p>扫码添加微信，获取更多车辆信息</p>
+            <div style="background: #f8f9fa; padding: 30px; border-radius: 12px; margin-bottom: 20px;">
+                <div style="font-size: 1.5rem; font-weight: 600; color: #333;">微信号：{{ shop_wechat }}</div>
+            </div>
+            <a href="weixin://addcontact/{{ shop_wechat }}" class="btn-contact btn-contact-wechat">
+                <i class="fab fa-weixin"></i>
+                打开微信
+            </a>
+        </div>
+    </div>
+
+    <script>
+        // Image Gallery
+        const images = {{ images|tojson }};
+        let currentIndex = 0;
+
+        function changeImage(direction) {
+            currentIndex += direction;
+            if (currentIndex >= images.length) currentIndex = 0;
+            if (currentIndex < 0) currentIndex = images.length - 1;
+            updateMainImage();
+        }
+
+        function selectImage(src, thumb) {
+            currentIndex = images.indexOf(src);
+            document.getElementById('mainImage').src = src;
+            
+            document.querySelectorAll('.gallery-thumb').forEach(t => t.classList.remove('active'));
+            thumb.classList.add('active');
+        }
+
+        function updateMainImage() {
+            document.getElementById('mainImage').src = images[currentIndex];
+            document.querySelectorAll('.gallery-thumb').forEach((t, i) => {
+                t.classList.toggle('active', i === currentIndex);
+            });
+        }
+
+        // Modal
+        function showPhoneModal() {
+            document.getElementById('phoneModal').classList.add('show');
+        }
+
+        function showWechatModal() {
+            document.getElementById('wechatModal').classList.add('show');
+        }
+
+        function closeModal(id) {
+            document.getElementById(id).classList.remove('show');
+        }
+
+        document.querySelectorAll('.modal-overlay').forEach(modal => {
+            modal.addEventListener('click', (e) => {
+                if (e.target === modal) {
+                    modal.classList.remove('show');
+                }
+            });
+        });
+
+        // Scroll to Top
+        function scrollToTop() {
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        window.addEventListener('scroll', () => {
+            const backToTop = document.getElementById('backToTop');
+            if (window.scrollY > 500) {
+                backToTop.classList.add('show');
+            } else {
+                backToTop.classList.remove('show');
+            }
+        });
+
+        // Mobile menu
+        const mobileMenuBtn = document.getElementById('mobileMenuBtn');
+        const mobileMenu = document.getElementById('mobileMenu');
+
+        mobileMenuBtn.addEventListener('click', () => {
+            mobileMenu.classList.toggle('active');
+            const icon = mobileMenuBtn.querySelector('i');
+            icon.classList.toggle('fa-bars');
+            icon.classList.toggle('fa-times');
+        });
+
+        // Header scroll effect
+        window.addEventListener('scroll', () => {
+            const header = document.querySelector('.header');
+            if (window.scrollY > 100) {
+                header.classList.add('scrolled');
+            } else {
+                header.classList.remove('scrolled');
+            }
+        });
+    </script>
+</body>
+</html>

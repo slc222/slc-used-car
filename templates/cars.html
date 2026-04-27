@@ -1,0 +1,594 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>全部车源 - 蜀来驰二手车</title>
+    <link rel="stylesheet" href="/static/css/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        .page-header {
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+            padding: 60px 0 80px;
+            text-align: center;
+            color: #fff;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .page-header::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.03'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+            opacity: 0.5;
+        }
+
+        .page-header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 15px;
+            position: relative;
+            z-index: 1;
+        }
+
+        .page-header p {
+            font-size: 1.1rem;
+            opacity: 0.8;
+            position: relative;
+            z-index: 1;
+        }
+
+        .breadcrumb {
+            padding: 20px 0;
+            background: #f8f9fa;
+        }
+
+        .breadcrumb-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .breadcrumb a {
+            color: #666;
+            text-decoration: none;
+            transition: color 0.3s;
+        }
+
+        .breadcrumb a:hover {
+            color: #e94560;
+        }
+
+        .breadcrumb span {
+            color: #999;
+        }
+
+        .breadcrumb-current {
+            color: #e94560;
+            font-weight: 500;
+        }
+
+        .filter-section {
+            background: #fff;
+            padding: 30px 0;
+            border-bottom: 1px solid #eee;
+            position: sticky;
+            top: 70px;
+            z-index: 100;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+        }
+
+        .filter-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        .filter-group {
+            margin-bottom: 20px;
+        }
+
+        .filter-group:last-child {
+            margin-bottom: 0;
+        }
+
+        .filter-label {
+            font-size: 0.9rem;
+            color: #666;
+            margin-bottom: 10px;
+            display: block;
+            font-weight: 500;
+        }
+
+        .filter-options {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .filter-btn {
+            padding: 10px 20px;
+            border: 2px solid #eee;
+            border-radius: 25px;
+            background: #fff;
+            color: #666;
+            font-size: 0.9rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+        }
+
+        .filter-btn:hover {
+            border-color: #e94560;
+            color: #e94560;
+        }
+
+        .filter-btn.active {
+            background: linear-gradient(135deg, #e94560, #ff6b6b);
+            border-color: transparent;
+            color: #fff;
+        }
+
+        .cars-section {
+            padding: 50px 0;
+            background: #f8f9fa;
+            min-height: 500px;
+        }
+
+        .cars-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        .cars-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+        }
+
+        .cars-count {
+            color: #666;
+            font-size: 1rem;
+        }
+
+        .cars-count strong {
+            color: #e94560;
+            font-weight: 600;
+        }
+
+        .cars-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+            gap: 30px;
+        }
+
+        .car-card {
+            background: #fff;
+            border-radius: 16px;
+            overflow: hidden;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+            transition: all 0.4s ease;
+            cursor: pointer;
+        }
+
+        .car-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
+        }
+
+        .car-card-image {
+            position: relative;
+            height: 200px;
+            overflow: hidden;
+        }
+
+        .car-card-image img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform 0.5s ease;
+        }
+
+        .car-card:hover .car-card-image img {
+            transform: scale(1.1);
+        }
+
+        .car-card-badge {
+            position: absolute;
+            top: 15px;
+            left: 15px;
+            background: linear-gradient(135deg, #e94560, #ff6b6b);
+            color: #fff;
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 600;
+        }
+
+        .car-card-badge.sold {
+            background: #999;
+        }
+
+        .car-card-body {
+            padding: 20px;
+        }
+
+        .car-card-title {
+            font-size: 1.15rem;
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 12px;
+            line-height: 1.4;
+        }
+
+        .car-card-info {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 8px;
+            margin-bottom: 15px;
+        }
+
+        .car-card-info-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            color: #666;
+            font-size: 0.85rem;
+        }
+
+        .car-card-info-item i {
+            color: #e94560;
+            width: 14px;
+        }
+
+        .car-card-footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding-top: 15px;
+            border-top: 1px solid #eee;
+        }
+
+        .car-card-price {
+            font-size: 1.4rem;
+            font-weight: 700;
+            color: #e94560;
+        }
+
+        .car-card-price span {
+            font-size: 0.85rem;
+            font-weight: 400;
+        }
+
+        .car-card-views {
+            color: #999;
+            font-size: 0.8rem;
+        }
+
+        .pagination {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 10px;
+            margin-top: 50px;
+        }
+
+        .pagination-btn {
+            padding: 10px 15px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            background: #fff;
+            color: #666;
+            text-decoration: none;
+            transition: all 0.3s;
+            cursor: pointer;
+        }
+
+        .pagination-btn:hover {
+            border-color: #e94560;
+            color: #e94560;
+        }
+
+        .pagination-btn.active {
+            background: linear-gradient(135deg, #e94560, #ff6b6b);
+            border-color: transparent;
+            color: #fff;
+        }
+
+        .pagination-btn.disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .no-results {
+            text-align: center;
+            padding: 80px 20px;
+        }
+
+        .no-results-icon {
+            font-size: 4rem;
+            color: #ddd;
+            margin-bottom: 20px;
+        }
+
+        .no-results h3 {
+            font-size: 1.5rem;
+            color: #333;
+            margin-bottom: 10px;
+        }
+
+        .no-results p {
+            color: #666;
+        }
+
+        @media (max-width: 768px) {
+            .page-header h1 {
+                font-size: 1.8rem;
+            }
+
+            .filter-section {
+                position: relative;
+                top: 0;
+            }
+
+            .filter-btn {
+                padding: 8px 16px;
+                font-size: 0.85rem;
+            }
+
+            .cars-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .cars-header {
+                flex-direction: column;
+                gap: 15px;
+                align-items: flex-start;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <header class="header">
+        <div class="container">
+            <div class="header-content">
+                <a href="/" class="logo">
+                    <i class="fas fa-car-side"></i>
+                    <span>蜀来驰二手车</span>
+                </a>
+                <nav class="nav">
+                    <a href="/" class="nav-link">首页</a>
+                    <a href="/cars" class="nav-link active">全部车源</a>
+                    <a href="/contact" class="nav-link">联系我们</a>
+                </nav>
+                <div class="header-phone">
+                    <i class="fas fa-phone"></i>
+                    <span>在线咨询</span>
+                </div>
+                <button class="mobile-menu-btn" id="mobileMenuBtn">
+                    <i class="fas fa-bars"></i>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- Mobile Menu -->
+    <div class="mobile-menu" id="mobileMenu">
+        <div class="mobile-menu-content">
+            <a href="/">首页</a>
+            <a href="/cars">全部车源</a>
+            <a href="/contact">联系我们</a>
+        </div>
+    </div>
+
+    <!-- Page Header -->
+    <div class="page-header">
+        <h1>全部车源</h1>
+        <p>精选优质二手车源，总有一款适合您</p>
+    </div>
+
+    <!-- Breadcrumb -->
+    <div class="breadcrumb">
+        <div class="breadcrumb-container">
+            <a href="/">首页</a>
+            <span>/</span>
+            <span class="breadcrumb-current">全部车源</span>
+        </div>
+    </div>
+
+    <!-- Filter Section -->
+    <div class="filter-section">
+        <div class="filter-container">
+            <div class="filter-group">
+                <span class="filter-label">价格筛选</span>
+                <div class="filter-options">
+                    <a href="/cars" class="filter-btn {% if not current_price %}active{% endif %}">全部</a>
+                    <a href="/cars?price=under2" class="filter-btn {% if current_price == 'under2' %}active{% endif %}">2万以下</a>
+                    <a href="/cars?price=2to5" class="filter-btn {% if current_price == '2to5' %}active{% endif %}">2-5万</a>
+                    <a href="/cars?price=5to10" class="filter-btn {% if current_price == '5to10' %}active{% endif %}">5-10万</a>
+                </div>
+            </div>
+            {% if all_brands %}
+            <div class="filter-group">
+                <span class="filter-label">品牌筛选</span>
+                <div class="filter-options">
+                    <a href="/cars{% if current_price %}?price={{ current_price }}{% endif %}" class="filter-btn {% if not current_brand %}active{% endif %}">全部</a>
+                    {% for brand in all_brands %}
+                    <a href="/cars?brand={{ brand }}{% if current_price %}&price={{ current_price }}{% endif %}" class="filter-btn {% if current_brand == brand %}active{% endif %}">{{ brand }}</a>
+                    {% endfor %}
+                </div>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- Cars Section -->
+    <section class="cars-section">
+        <div class="cars-container">
+            <div class="cars-header">
+                <div class="cars-count">
+                    共找到 <strong>{{ pagination.total }}</strong> 辆符合条件的车辆
+                </div>
+            </div>
+
+            {% if cars %}
+            <div class="cars-grid">
+                {% for car in cars %}
+                <div class="car-card" onclick="location.href='/car/{{ car.id }}'">
+                    <div class="car-card-image">
+                        {% if car.images %}
+                            {% set img_list = car.images[1:-1].split(',') %}
+                            {% set first_img = img_list[0][2:-1] if img_list else '' %}
+                            <img src="{{ first_img }}" alt="{{ car.name }}" onerror="this.src='/static/images/placeholder.jpg'">
+                        {% else %}
+                            <img src="/static/images/placeholder.jpg" alt="{{ car.name }}">
+                        {% endif %}
+                        {% if car.status == 'sold' %}
+                        <span class="car-card-badge sold">已售</span>
+                        {% else %}
+                        <span class="car-card-badge">在售</span>
+                        {% endif %}
+                    </div>
+                    <div class="car-card-body">
+                        <h3 class="car-card-title">{{ car.name }}</h3>
+                        <div class="car-card-info">
+                            <div class="car-card-info-item">
+                                <i class="fas fa-calendar"></i>
+                                <span>{{ car.year }}年</span>
+                            </div>
+                            <div class="car-card-info-item">
+                                <i class="fas fa-tachometer-alt"></i>
+                                <span>{{ car.mileage }}万公里</span>
+                            </div>
+                            <div class="car-card-info-item">
+                                <i class="fas fa-tag"></i>
+                                <span>{{ car.brand }}</span>
+                            </div>
+                        </div>
+                        <div class="car-card-footer">
+                            <div class="car-card-price">
+                                {{ car.price }}<span>万</span>
+                            </div>
+                            <div class="car-card-views">
+                                <i class="fas fa-eye"></i> {{ car.view_count }}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+
+            <!-- Pagination -->
+            {% if pagination.pages > 1 %}
+            <div class="pagination">
+                {% if pagination.has_prev %}
+                <a href="/cars?page={{ pagination.prev_num }}{% if current_price %}&price={{ current_price }}{% endif %}{% if current_brand %}&brand={{ current_brand }}{% endif %}" class="pagination-btn">
+                    <i class="fas fa-chevron-left"></i>
+                </a>
+                {% else %}
+                <span class="pagination-btn disabled"><i class="fas fa-chevron-left"></i></span>
+                {% endif %}
+
+                {% for p in range(1, pagination.pages + 1) %}
+                    {% if p == pagination.page %}
+                    <span class="pagination-btn active">{{ p }}</span>
+                    {% elif p <= 3 or p > pagination.pages - 3 or (p >= pagination.page - 1 and p <= pagination.page + 1) %}
+                    <a href="/cars?page={{ p }}{% if current_price %}&price={{ current_price }}{% endif %}{% if current_brand %}&brand={{ current_brand }}{% endif %}" class="pagination-btn">{{ p }}</a>
+                    {% elif p == 4 or p == pagination.pages - 3 %}
+                    <span class="pagination-btn">...</span>
+                    {% endif %}
+                {% endfor %}
+
+                {% if pagination.has_next %}
+                <a href="/cars?page={{ pagination.next_num }}{% if current_price %}&price={{ current_price }}{% endif %}{% if current_brand %}&brand={{ current_brand }}{% endif %}" class="pagination-btn">
+                    <i class="fas fa-chevron-right"></i>
+                </a>
+                {% else %}
+                <span class="pagination-btn disabled"><i class="fas fa-chevron-right"></i></span>
+                {% endif %}
+            </div>
+            {% endif %}
+
+            {% else %}
+            <div class="no-results">
+                <div class="no-results-icon">
+                    <i class="fas fa-car"></i>
+                </div>
+                <h3>暂无符合条件的车辆</h3>
+                <p>试试调整筛选条件，或联系我们获取更多车源信息</p>
+            </div>
+            {% endif %}
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-section">
+                    <h3>蜀来驰二手车</h3>
+                    <p>专业二手车服务商</p>
+                </div>
+                <div class="footer-section">
+                    <h4>快速链接</h4>
+                    <ul>
+                        <li><a href="/">首页</a></li>
+                        <li><a href="/cars">全部车源</a></li>
+                        <li><a href="/contact">联系我们</a></li>
+                    </ul>
+                </div>
+                <div class="footer-section">
+                    <h4>联系方式</h4>
+                    <ul>
+                        <li><i class="fas fa-phone"></i> 400-888-8888</li>
+                        <li><i class="fas fa-map-marker-alt"></i> 四川省威远县</li>
+                    </ul>
+                </div>
+                <div class="footer-section">
+                    <h4>关注我们</h4>
+                    <div class="social-links">
+                        <a href="#" class="social-link"><i class="fab fa-weixin"></i></a>
+                        <a href="#" class="social-link"><i class="fab fa-weibo"></i></a>
+                        <a href="#" class="social-link"><i class="fab fa-tiktok"></i></a>
+                    </div>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2024 蜀来驰二手车. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        // Mobile menu
+        const mobileMenuBtn = document.getElementById('mobileMenuBtn');
+        const mobileMenu = document.getElementById('mobileMenu');
+
+        mobileMenuBtn.addEventListener('click', () => {
+            mobileMenu.classList.toggle('active');
+            const icon = mobileMenuBtn.querySelector('i');
+            icon.classList.toggle('fa-bars');
+            icon.classList.toggle('fa-times');
+        });
+
+        // Header scroll effect
+        window.addEventListener('scroll', () => {
+            const header = document.querySelector('.header');
+            if (window.scrollY > 100) {
+                header.classList.add('scrolled');
+            } else {
+                header.classList.remove('scrolled');
+            }
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,431 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>联系我们 - 蜀来驰二手车</title>
+    <link rel="stylesheet" href="/static/css/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        .page-header {
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+            padding: 60px 0 80px;
+            text-align: center;
+            color: #fff;
+        }
+
+        .page-header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 15px;
+        }
+
+        .page-header p {
+            font-size: 1.1rem;
+            opacity: 0.8;
+        }
+
+        .contact-section {
+            padding: 80px 0;
+            background: #f8f9fa;
+        }
+
+        .contact-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        .contact-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 60px;
+        }
+
+        .contact-info {
+            background: #fff;
+            border-radius: 20px;
+            padding: 40px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+        }
+
+        .contact-info h2 {
+            font-size: 1.8rem;
+            color: #333;
+            margin-bottom: 30px;
+        }
+
+        .contact-items {
+            display: flex;
+            flex-direction: column;
+            gap: 30px;
+        }
+
+        .contact-item {
+            display: flex;
+            align-items: flex-start;
+            gap: 20px;
+        }
+
+        .contact-item-icon {
+            width: 60px;
+            height: 60px;
+            background: linear-gradient(135deg, #e94560, #ff6b6b);
+            border-radius: 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #fff;
+            font-size: 1.4rem;
+            flex-shrink: 0;
+        }
+
+        .contact-item-content h4 {
+            font-size: 1.1rem;
+            color: #333;
+            margin-bottom: 8px;
+        }
+
+        .contact-item-content p {
+            color: #666;
+            font-size: 1rem;
+            line-height: 1.6;
+        }
+
+        .contact-hours {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 12px;
+            margin-top: 30px;
+        }
+
+        .contact-hours h4 {
+            color: #333;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .contact-hours h4 i {
+            color: #e94560;
+        }
+
+        .contact-hours ul {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        .contact-hours li {
+            color: #666;
+            padding: 5px 0;
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .contact-map {
+            background: #fff;
+            border-radius: 20px;
+            overflow: hidden;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+            min-height: 500px;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .map-placeholder {
+            flex: 1;
+            background: linear-gradient(135deg, #f8f9fa, #e9ecef);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 40px;
+            text-align: center;
+        }
+
+        .map-placeholder i {
+            font-size: 4rem;
+            color: #e94560;
+            margin-bottom: 20px;
+        }
+
+        .map-placeholder h3 {
+            color: #333;
+            margin-bottom: 10px;
+        }
+
+        .map-placeholder p {
+            color: #666;
+        }
+
+        .map-iframe {
+            width: 100%;
+            height: 350px;
+            border: none;
+        }
+
+        .qr-section {
+            padding: 60px 0;
+            background: #fff;
+        }
+
+        .qr-container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 0 20px;
+            text-align: center;
+        }
+
+        .qr-section h2 {
+            font-size: 2rem;
+            color: #333;
+            margin-bottom: 40px;
+        }
+
+        .qr-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 40px;
+        }
+
+        .qr-card {
+            background: #f8f9fa;
+            border-radius: 20px;
+            padding: 30px;
+            text-align: center;
+        }
+
+        .qr-card-icon {
+            width: 80px;
+            height: 80px;
+            background: linear-gradient(135deg, #07c160, #1aad19);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #fff;
+            font-size: 2rem;
+            margin: 0 auto 20px;
+        }
+
+        .qr-card h4 {
+            color: #333;
+            font-size: 1.2rem;
+            margin-bottom: 10px;
+        }
+
+        .qr-card p {
+            color: #666;
+            font-size: 0.95rem;
+        }
+
+        @media (max-width: 992px) {
+            .contact-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .qr-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .page-header h1 {
+                font-size: 1.8rem;
+            }
+
+            .contact-info {
+                padding: 25px;
+            }
+
+            .contact-item-icon {
+                width: 50px;
+                height: 50px;
+                font-size: 1.2rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <header class="header">
+        <div class="container">
+            <div class="header-content">
+                <a href="/" class="logo">
+                    <i class="fas fa-car-side"></i>
+                    <span>{{ shop_name }}</span>
+                </a>
+                <nav class="nav">
+                    <a href="/" class="nav-link">首页</a>
+                    <a href="/cars" class="nav-link">全部车源</a>
+                    <a href="/contact" class="nav-link active">联系我们</a>
+                </nav>
+                <div class="header-phone">
+                    <i class="fas fa-phone"></i>
+                    <span>在线咨询</span>
+                </div>
+                <button class="mobile-menu-btn" id="mobileMenuBtn">
+                    <i class="fas fa-bars"></i>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- Mobile Menu -->
+    <div class="mobile-menu" id="mobileMenu">
+        <div class="mobile-menu-content">
+            <a href="/">首页</a>
+            <a href="/cars">全部车源</a>
+            <a href="/contact">联系我们</a>
+        </div>
+    </div>
+
+    <!-- Page Header -->
+    <div class="page-header">
+        <h1>联系我们</h1>
+        <p>期待您的光临，随时恭候您的咨询</p>
+    </div>
+
+    <!-- Contact Section -->
+    <section class="contact-section">
+        <div class="contact-container">
+            <div class="contact-grid">
+                <div class="contact-info">
+                    <h2>联系方式</h2>
+                    <div class="contact-items">
+                        <div class="contact-item">
+                            <div class="contact-item-icon">
+                                <i class="fas fa-map-marker-alt"></i>
+                            </div>
+                            <div class="contact-item-content">
+                                <h4>展厅地址</h4>
+                                <p>{{ shop_address }}</p>
+                            </div>
+                        </div>
+                        <div class="contact-item">
+                            <div class="contact-item-icon">
+                                <i class="fas fa-phone-alt"></i>
+                            </div>
+                            <div class="contact-item-content">
+                                <h4>联系电话</h4>
+                                <p>{{ shop_phone }}</p>
+                            </div>
+                        </div>
+                        <div class="contact-item">
+                            <div class="contact-item-icon">
+                                <i class="fab fa-weixin"></i>
+                            </div>
+                            <div class="contact-item-content">
+                                <h4>微信咨询</h4>
+                                <p>{{ shop_wechat }}</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="contact-hours">
+                        <h4><i class="fas fa-clock"></i> 营业时间</h4>
+                        <ul>
+                            <li><span>周一至周五</span><span>09:00 - 18:00</span></li>
+                            <li><span>周六至周日</span><span>09:00 - 18:00</span></li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="contact-map">
+                    <iframe 
+                        class="map-iframe"
+                        src="https://uri.amap.com/search?view=map&keywords={{ shop_address }}&center=104.6771,29.5652&zoom=14&height=350"
+                        loading="lazy"
+                        referrerpolicy="no-referrer-when-downgrade">
+                    </iframe>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- QR Section -->
+    <section class="qr-section">
+        <div class="qr-container">
+            <h2>扫码关注</h2>
+            <div class="qr-grid">
+                <div class="qr-card">
+                    <div class="qr-card-icon">
+                        <i class="fab fa-tiktok"></i>
+                    </div>
+                    <h4>抖音</h4>
+                    <p>关注我们的抖音账号<br>获取更多车辆视频</p>
+                    <p style="margin-top: 15px; color: #e94560; font-weight: 600;">抖音粉丝 2.2万+</p>
+                </div>
+                <div class="qr-card">
+                    <div class="qr-card-icon">
+                        <i class="fab fa-weixin"></i>
+                    </div>
+                    <h4>微信公众号</h4>
+                    <p>关注公众号获取<br>最新车源信息</p>
+                    <p style="margin-top: 15px; color: #e94560; font-weight: 600;">微信号: {{ shop_wechat }}</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-section">
+                    <h3>{{ shop_name }}</h3>
+                    <p>专业二手车服务商</p>
+                </div>
+                <div class="footer-section">
+                    <h4>快速链接</h4>
+                    <ul>
+                        <li><a href="/">首页</a></li>
+                        <li><a href="/cars">全部车源</a></li>
+                        <li><a href="/contact">联系我们</a></li>
+                    </ul>
+                </div>
+                <div class="footer-section">
+                    <h4>联系方式</h4>
+                    <ul>
+                        <li><i class="fas fa-phone"></i> {{ shop_phone }}</li>
+                        <li><i class="fas fa-map-marker-alt"></i> {{ shop_address }}</li>
+                    </ul>
+                </div>
+                <div class="footer-section">
+                    <h4>关注我们</h4>
+                    <div class="social-links">
+                        <a href="#" class="social-link"><i class="fab fa-weixin"></i></a>
+                        <a href="#" class="social-link"><i class="fab fa-weibo"></i></a>
+                        <a href="#" class="social-link"><i class="fab fa-tiktok"></i></a>
+                    </div>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2024 {{ shop_name }}. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        // Mobile menu
+        const mobileMenuBtn = document.getElementById('mobileMenuBtn');
+        const mobileMenu = document.getElementById('mobileMenu');
+
+        mobileMenuBtn.addEventListener('click', () => {
+            mobileMenu.classList.toggle('active');
+            const icon = mobileMenuBtn.querySelector('i');
+            icon.classList.toggle('fa-bars');
+            icon.classList.toggle('fa-times');
+        });
+
+        // Header scroll effect
+        window.addEventListener('scroll', () => {
+            const header = document.querySelector('.header');
+            if (window.scrollY > 100) {
+                header.classList.add('scrolled');
+            } else {
+                header.classList.remove('scrolled');
+            }
+        });
+    </script>
+</body>
+</html>

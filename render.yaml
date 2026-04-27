@@ -1,0 +1,18 @@
+# Render.com 部署配置
+# 免费层说明：
+# - 免费实例会在30分钟无活动后休眠
+# - 不支持持久化磁盘，每次部署数据会重置
+# - 建议用于演示，正式使用建议升级
+
+services:
+  - type: web
+    name: slc-used-car
+    env: python
+    buildCommand: pip install -r requirements.txt
+    startCommand: gunicorn app:app --bind 0.0.0.0:$PORT --workers 2 --threads 4
+    healthCheckPath: /
+    autoDeploy: true
+    plan: free
+    envVars:
+      - key: PYTHON_VERSION
+        value: "3.11"

@@ -1,0 +1,275 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ '编辑车辆' if car else '添加车辆' }} - 蜀来驰二手车管理后台</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: #f5f6fa; min-height: 100vh; }
+        
+        .admin-layout { display: flex; min-height: 100vh; }
+        
+        .sidebar { width: 260px; background: linear-gradient(180deg, #1a1a2e 0%, #16213e 100%); color: #fff; position: fixed; height: 100vh; overflow-y: auto; z-index: 100; }
+        .sidebar-header { padding: 25px 20px; border-bottom: 1px solid rgba(255, 255, 255, 0.1); }
+        .sidebar-logo { display: flex; align-items: center; gap: 12px; }
+        .sidebar-logo-icon { width: 45px; height: 45px; background: linear-gradient(135deg, #e94560, #ff6b6b); border-radius: 12px; display: flex; align-items: center; justify-content: center; }
+        .sidebar-logo-icon i { font-size: 1.3rem; color: #fff; }
+        .sidebar-logo-text { font-size: 1.1rem; font-weight: 600; }
+        .sidebar-nav { padding: 20px 0; }
+        .nav-section { margin-bottom: 25px; }
+        .nav-section-title { padding: 0 20px; font-size: 0.75rem; color: rgba(255, 255, 255, 0.5); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 10px; }
+        .nav-item { display: flex; align-items: center; gap: 12px; padding: 12px 20px; color: rgba(255, 255, 255, 0.7); text-decoration: none; transition: all 0.3s; border-left: 3px solid transparent; }
+        .nav-item:hover, .nav-item.active { background: rgba(255, 255, 255, 0.1); color: #fff; border-left-color: #e94560; }
+        .nav-item i { width: 20px; text-align: center; }
+        
+        .main-content { flex: 1; margin-left: 260px; padding: 30px; }
+        
+        .top-bar { display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px; background: #fff; padding: 20px 25px; border-radius: 15px; box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05); }
+        .top-bar-left h2 { font-size: 1.5rem; color: #333; margin-bottom: 5px; }
+        .top-bar-left p { color: #999; font-size: 0.9rem; }
+        .btn { padding: 10px 20px; border-radius: 8px; font-size: 0.9rem; cursor: pointer; transition: all 0.3s; text-decoration: none; display: inline-flex; align-items: center; gap: 8px; border: none; }
+        .btn-primary { background: linear-gradient(135deg, #e94560, #ff6b6b); color: #fff; }
+        .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 5px 20px rgba(233, 69, 96, 0.4); }
+        .btn-secondary { background: #f5f6fa; color: #666; }
+        .btn-secondary:hover { background: #e9ecef; }
+        
+        .form-card { background: #fff; border-radius: 15px; padding: 30px; box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05); }
+        .form-title { font-size: 1.2rem; color: #333; margin-bottom: 25px; padding-bottom: 15px; border-bottom: 1px solid #eee; }
+        
+        .form-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 25px; }
+        .form-group { margin-bottom: 5px; }
+        .form-group.full-width { grid-column: 1 / -1; }
+        .form-group label { display: block; font-size: 0.9rem; color: #333; margin-bottom: 8px; font-weight: 500; }
+        .form-group label span { color: #ef4444; }
+        .form-group input, .form-group select, .form-group textarea { width: 100%; padding: 12px 15px; border: 2px solid #eee; border-radius: 10px; font-size: 0.95rem; transition: all 0.3s; outline: none; font-family: inherit; }
+        .form-group input:focus, .form-group select:focus, .form-group textarea:focus { border-color: #e94560; box-shadow: 0 0 0 4px rgba(233, 69, 96, 0.1); }
+        .form-group textarea { min-height: 120px; resize: vertical; }
+        .form-hint { font-size: 0.8rem; color: #999; margin-top: 5px; }
+        
+        .form-section { margin-top: 30px; padding-top: 30px; border-top: 1px solid #eee; }
+        
+        .image-upload-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 15px; }
+        .image-upload-item { position: relative; aspect-ratio: 4/3; border: 2px dashed #ddd; border-radius: 10px; overflow: hidden; display: flex; flex-direction: column; align-items: center; justify-content: center; cursor: pointer; transition: all 0.3s; background: #fafafa; }
+        .image-upload-item:hover { border-color: #e94560; background: #fff5f7; }
+        .image-upload-item i { font-size: 2rem; color: #ccc; margin-bottom: 8px; }
+        .image-upload-item span { font-size: 0.8rem; color: #999; }
+        .image-upload-item input { position: absolute; width: 100%; height: 100%; opacity: 0; cursor: pointer; }
+        .image-upload-item.has-image { border-style: solid; border-color: #eee; }
+        .image-upload-item.has-image img { width: 100%; height: 100%; object-fit: cover; }
+        .image-upload-item.has-image i, .image-upload-item.has-image span { display: none; }
+        .image-upload-item .remove-image { position: absolute; top: 5px; right: 5px; width: 25px; height: 25px; background: rgba(0,0,0,0.6); border-radius: 50%; display: none; align-items: center; justify-content: center; color: #fff; font-size: 0.8rem; }
+        .image-upload-item.has-image:hover .remove-image { display: flex; }
+        
+        .form-actions { display: flex; gap: 15px; margin-top: 30px; padding-top: 30px; border-top: 1px solid #eee; }
+        
+        .alert { padding: 15px; border-radius: 10px; margin-bottom: 20px; display: none; }
+        .alert-success { background: #dcfce7; color: #22c55e; border: 1px solid #bbf7d0; }
+        .alert-error { background: #fee2e2; color: #ef4444; border: 1px solid #fecaca; }
+
+        @media (max-width: 992px) {
+            .form-grid { grid-template-columns: 1fr; }
+            .image-upload-grid { grid-template-columns: repeat(3, 1fr); }
+        }
+        @media (max-width: 768px) {
+            .sidebar { transform: translateX(-100%); }
+            .main-content { margin-left: 0; }
+            .image-upload-grid { grid-template-columns: repeat(2, 1fr); }
+        }
+    </style>
+</head>
+<body>
+    <div class="admin-layout">
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <div class="sidebar-logo">
+                    <div class="sidebar-logo-icon"><i class="fas fa-car-side"></i></div>
+                    <span class="sidebar-logo-text">蜀来驰二手车</span>
+                </div>
+            </div>
+            <nav class="sidebar-nav">
+                <div class="nav-section">
+                    <div class="nav-section-title">主菜单</div>
+                    <a href="/admin" class="nav-item"><i class="fas fa-chart-pie"></i><span>控制台</span></a>
+                    <a href="/admin/cars" class="nav-item active"><i class="fas fa-car"></i><span>车辆管理</span></a>
+                    <a href="/admin/sliders" class="nav-item"><i class="fas fa-images"></i><span>轮播图管理</span></a>
+                </div>
+                <div class="nav-section">
+                    <div class="nav-section-title">系统</div>
+                    <a href="/admin/settings" class="nav-item"><i class="fas fa-cog"></i><span>网站设置</span></a>
+                    <a href="/admin/password" class="nav-item"><i class="fas fa-key"></i><span>修改密码</span></a>
+                    <a href="/" class="nav-item"><i class="fas fa-home"></i><span>返回网站</span></a>
+                    <a href="/admin/logout" class="nav-item"><i class="fas fa-sign-out-alt"></i><span>退出登录</span></a>
+                </div>
+            </nav>
+        </aside>
+
+        <main class="main-content">
+            <div class="top-bar">
+                <div class="top-bar-left">
+                    <h2>{{ '编辑车辆' if car else '添加车辆' }}</h2>
+                    <p>{{ '修改车辆信息' if car else '上传新的车辆信息' }}</p>
+                </div>
+                <div class="top-bar-right">
+                    <a href="/admin/cars" class="btn btn-secondary"><i class="fas fa-arrow-left"></i> 返回列表</a>
+                </div>
+            </div>
+
+            <div class="alert alert-success" id="successAlert"></div>
+            <div class="alert alert-error" id="errorAlert"></div>
+
+            <form id="carForm" class="form-card">
+                <h3 class="form-title"><i class="fas fa-car"></i> 基本信息</h3>
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label>车型名称 <span>*</span></label>
+                        <input type="text" name="name" value="{{ car.name if car else '' }}" placeholder="例如：大众朗逸 2019款 自动舒适版" required>
+                    </div>
+                    <div class="form-group">
+                        <label>品牌 <span>*</span></label>
+                        <input type="text" name="brand" value="{{ car.brand if car else '' }}" placeholder="例如：大众" required>
+                    </div>
+                    <div class="form-group">
+                        <label>价格（万元）<span>*</span></label>
+                        <input type="number" name="price" value="{{ car.price if car else '' }}" step="0.1" min="0" placeholder="例如：7.5" required>
+                    </div>
+                    <div class="form-group">
+                        <label>上牌年份 <span>*</span></label>
+                        <input type="number" name="year" value="{{ car.year if car else '' }}" min="1990" max="2025" placeholder="例如：2019" required>
+                    </div>
+                    <div class="form-group">
+                        <label>行驶里程（万公里）<span>*</span></label>
+                        <input type="number" name="mileage" value="{{ car.mileage if car else '' }}" step="0.01" min="0" placeholder="例如：3.2" required>
+                    </div>
+                    <div class="form-group">
+                        <label>状态</label>
+                        <select name="status">
+                            <option value="onsale" {% if car and car.status == 'onsale' %}selected{% endif %}>在售</option>
+                            <option value="sold" {% if car and car.status == 'sold' %}selected{% endif %}>已售</option>
+                            <option value="hidden" {% if car and car.status == 'hidden' %}selected{% endif %}>已下架</option>
+                        </select>
+                    </div>
+                    <div class="form-group full-width">
+                        <label>车况描述</label>
+                        <textarea name="description" placeholder="描述车辆的整体状况、配置信息、改装情况等">{{ car.description if car else '' }}</textarea>
+                    </div>
+                    <div class="form-group full-width">
+                        <label>三方检测报告</label>
+                        <textarea name="inspection_report" placeholder="输入第三方检测机构的检测结果">{{ car.inspection_report if car else '' }}</textarea>
+                    </div>
+                </div>
+
+                <div class="form-section">
+                    <h3 class="form-title"><i class="fas fa-images"></i> 车辆图片（最多5张）</h3>
+                    <div class="image-upload-grid">
+                        {% for i in range(1, 6) %}
+                        <div class="image-upload-item" id="upload{{ i }}">
+                            <i class="fas fa-plus"></i>
+                            <span>图片 {{ i }}</span>
+                            <input type="file" name="image{{ i }}" accept="image/*" onchange="previewImage(this, 'upload{{ i }}')">
+                            <button type="button" class="remove-image" onclick="removeImage('upload{{ i }}', 'image{{ i }}')"><i class="fas fa-times"></i></button>
+                        </div>
+                        {% endfor %}
+                    </div>
+                    <p class="form-hint">支持 JPG、PNG、GIF 格式，单张图片不超过 5MB</p>
+                </div>
+
+                <div class="form-actions">
+                    <button type="submit" class="btn btn-primary" id="submitBtn">
+                        <i class="fas fa-save"></i> {{ '保存修改' if car else '添加车辆' }}
+                    </button>
+                    <a href="/admin/cars" class="btn btn-secondary">取消</a>
+                </div>
+            </form>
+        </main>
+    </div>
+
+    <script>
+        // 图片预览
+        function previewImage(input, containerId) {
+            const container = document.getElementById(containerId);
+            if (input.files && input.files[0]) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    container.classList.add('has-image');
+                    container.style.backgroundImage = `url(${e.target.result})`;
+                    container.style.backgroundSize = 'cover';
+                    container.style.backgroundPosition = 'center';
+                };
+                reader.readAsDataURL(input.files[0]);
+            }
+        }
+
+        function removeImage(containerId, inputName) {
+            const container = document.getElementById(containerId);
+            container.classList.remove('has-image');
+            container.style.backgroundImage = '';
+            const input = container.querySelector(`input[name="${inputName}"]`);
+            if (input) input.value = '';
+            event.stopPropagation();
+        }
+
+        // 加载已有图片
+        {% if car and car.images_list %}
+            const existingImages = {{ car.images_list|tojson }};
+            const containers = ['upload1', 'upload2', 'upload3', 'upload4', 'upload5'];
+            existingImages.forEach((img, index) => {
+                if (index < containers.length) {
+                    const container = document.getElementById(containers[index]);
+                    container.classList.add('has-image');
+                    container.style.backgroundImage = `url(${img})`;
+                    container.style.backgroundSize = 'cover';
+                    container.style.backgroundPosition = 'center';
+                }
+            });
+        {% endif %}
+
+        // 表单提交
+        const form = document.getElementById('carForm');
+        const submitBtn = document.getElementById('submitBtn');
+        const successAlert = document.getElementById('successAlert');
+        const errorAlert = document.getElementById('errorAlert');
+
+        form.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            submitBtn.disabled = true;
+            submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> 提交中...';
+            
+            const formData = new FormData(form);
+            
+            try {
+                const url = '{{ "/admin/car/edit/"|safe }}{{ car.id if car else "" }}';
+                const response = await fetch(url, {
+                    method: 'POST',
+                    body: formData
+                });
+                
+                const result = await response.json();
+                
+                if (result.success) {
+                    successAlert.textContent = '{{ "修改成功" if car else "添加成功" }}，正在跳转...';
+                    successAlert.style.display = 'block';
+                    errorAlert.style.display = 'none';
+                    setTimeout(() => {
+                        window.location.href = '/admin/cars';
+                    }, 1500);
+                } else {
+                    errorAlert.textContent = result.message || '操作失败';
+                    errorAlert.style.display = 'block';
+                    successAlert.style.display = 'none';
+                    submitBtn.disabled = false;
+                    submitBtn.innerHTML = '<i class="fas fa-save"></i> {{ "保存修改" if car else "添加车辆" }}';
+                }
+            } catch (error) {
+                errorAlert.textContent = '网络错误，请重试';
+                errorAlert.style.display = 'block';
+                successAlert.style.display = 'none';
+                submitBtn.disabled = false;
+                submitBtn.innerHTML = '<i class="fas fa-save"></i> {{ "保存修改" if car else "添加车辆" }}';
+            }
+        });
+    </script>
+</body>
+</html>
